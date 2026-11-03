@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101b2d">
+<title>PowerShare – Prototyp</title>
+<style>
+:root{--bg:#f3f6fb;--ink:#142033;--muted:#64748b;--blue:#246bfe;--navy:#101b2d;--line:#e5eaf2;--green:#16a36a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:var(--navy);color:white;padding:24px 20px 22px;border-radius:0 0 24px 24px}
+.top{display:flex;justify-content:space-between;align-items:center}.logo{font-weight:800;font-size:22px;letter-spacing:-.5px}.logo span{color:#76a5ff}
+.pill{background:#203552;color:#cfe0ff;padding:7px 11px;border-radius:30px;font-size:12px}
+h1{font-size:26px;line-height:1.15;margin:25px 0 8px;max-width:320px}header p{color:#c4d0e1;margin:0;font-size:14px}
+main{max-width:680px;margin:auto;padding:18px 16px 100px}.section-head{display:flex;justify-content:space-between;align-items:center;margin:8px 2px 12px}
+h2{font-size:19px;margin:0} .muted{color:var(--muted);font-size:13px}
+.search{background:white;border:1px solid var(--line);border-radius:14px;padding:13px 15px;color:#8390a3;margin-bottom:17px}
+.station{background:white;border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:12px;display:flex;gap:13px;align-items:center}
+.station-icon{width:56px;height:56px;flex:none;border-radius:15px;background:#eaf1ff;display:grid;place-items:center;font-size:27px}
+.station h3{margin:0 0 5px;font-size:16px}.station p{margin:0;color:var(--muted);font-size:13px}
+.avail{margin-left:auto;text-align:right;white-space:nowrap}.avail b{display:block;color:var(--green);font-size:14px}.avail small{color:var(--muted)}
+button{border:0;border-radius:13px;background:var(--blue);color:white;padding:13px 16px;font-size:15px;font-weight:700;cursor:pointer}
+button.secondary{background:#edf3ff;color:#205bd5}button.dark{background:var(--navy)}button:disabled{opacity:.45}
+.wide{width:100%;margin-top:12px}.panel{display:none}.panel.active{display:block}
+.card{background:white;border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px}
+.qr{width:164px;height:164px;border:9px solid #edf2fa;border-radius:15px;margin:15px auto;display:grid;place-items:center;font-size:72px;background:repeating-linear-gradient(45deg,#f8faff,#f8faff 6px,#edf2fa 6px,#edf2fa 12px)}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:9px 4px calc(9px + env(safe-area-inset-bottom));z-index:5}
+nav button{background:transparent;color:#718096;padding:8px 7px;font-size:11px;display:flex;flex-direction:column;gap:4px;align-items:center;min-width:62px}
+nav button span{font-size:20px}nav button.selected{color:var(--blue)}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:#f5f8ff;padding:15px;border-radius:14px}.stat b{font-size:23px;display:block}.stat small{color:var(--muted)}
+.notice{font-size:12px;color:#66758a;line-height:1.5;background:#f5f8ff;padding:12px;border-radius:12px;margin-top:14px}
+.tag{font-size:11px;background:#e9f8f1;color:#128454;padding:5px 8px;border-radius:20px}
+.modal{position:fixed;inset:0;background:#07132699;display:none;align-items:end;z-index:10}.modal.show{display:flex}.sheet{background:white;width:100%;max-width:680px;margin:auto auto 0;border-radius:24px 24px 0 0;padding:23px 20px 30px}
+.sheet h2{margin-bottom:8px}.close{float:right;background:#edf1f7;color:#34445c;padding:8px 12px}
+footer{text-align:center;color:#8a96a8;font-size:11px;padding:12px}
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.shop-product{border:1px solid var(--line);border-radius:15px;background:white;padding:13px}
+.shop-product .art{height:85px;border-radius:11px;background:#edf3ff;display:grid;place-items:center;font-size:40px;margin-bottom:9px}
+.shop-product h3{font-size:15px;margin:0 0 5px}.shop-product p{font-size:12px;color:var(--muted);line-height:1.4;min-height:50px}
+.shop-product strong{display:block;font-size:18px;margin:8px 0}.shop-product button{width:100%;font-size:12px;padding:10px 5px}
+#shopCode{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;font:inherit;margin:12px 0}
+@media(max-width:420px){nav button{min-width:0;padding:7px 3px;font-size:9px}nav button span{font-size:18px}.shop-grid{gap:7px}.shop-product{padding:9px}}
+.map-wrap{height:360px;border-radius:16px;overflow:hidden;border:1px solid var(--line)}#stationMap{height:100%;width:100%}
+.map-tools{display:flex;gap:8px;margin-bottom:10px}.map-tools input,.field{min-width:0;flex:1;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit}
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.product{background:white;border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column}
+.product-art{height:95px;border-radius:12px;background:#edf3ff;display:grid;place-items:center;font-size:44px;margin-bottom:10px}
+.product h3{font-size:15px;margin:0 0 5px}.product p{font-size:12px;color:var(--muted);line-height:1.4}.product-price{font-size:18px;font-weight:800;margin-top:auto;margin-bottom:9px}.product button{width:100%;font-size:12px;padding:10px 5px}
+.cart-line,.cart-total{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}.cart-total{font-weight:800;border:0;padding-top:14px}
+.field{width:100%;margin:5px 0 10px;background:white}@media(max-width:420px){nav button{min-width:0;padding:7px 4px;font-size:10px}.shop-grid{gap:8px}}
+.shop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.shop-product{background:white;border:1px solid var(--line);border-radius:15px;padding:12px;display:flex;flex-direction:column}
+.shop-product .art{display:grid;place-items:center;height:88px;background:#edf3ff;border-radius:12px;font-size:38px}
+.shop-product h3{font-size:15px;margin:10px 0 0}.shop-product p{font-size:12px;color:var(--muted);line-height:1.5;flex:1}
+.shop-product strong{margin:8px 0}.shop-product button{font-size:12px;padding:10px 6px}
+.cart-line,.cart-total{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.cart-total{font-weight:800;border-bottom:0}
+nav{z-index:100;touch-action:manipulation}nav button{touch-action:manipulation;cursor:pointer}
+@media(max-width:420px){nav button{min-width:0;font-size:10px;padding:8px 3px}}
+
+nav a{background:transparent;color:#718096;padding:8px 4px;font-size:11px;font-weight:700;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;text-decoration:none;flex:1;min-width:0;touch-action:manipulation}
+nav a span{font-size:20px}nav a:focus-visible{outline:2px solid var(--blue)}
+.panel{display:none}.panel.active{display:block}
+body:has(.panel:target) .panel.active:not(:target){display:none}
+.panel:target{display:block}
+body:has(#shop-gate:target) #shop{display:none}
+body:has(#shop:target) #shop:not(.unlocked){display:none}
+@media(max-width:420px){nav a{font-size:10px}}
+#demoCheckout .field{display:block;width:100%;margin:6px 0 12px;padding:12px;border:1px solid var(--line);border-radius:10px}
+#shop-gate input{font-size:16px}
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+<header>
+ <div class="top"><div class="logo">Power<span>Share</span></div><div class="pill">DEMO-PROTOTYP</div></div>
+ <h1>Strom teilen.<br>Unterwegs bleiben.</h1>
+ <p>Finde eine Station und leihe dir eine Powerbank aus.</p>
+</header>
+<main>
+ <section id="discover" class="panel active">
+  <div class="section-head"><h2>Stationen in deiner Nähe</h2><span class="muted">Beispielorte</span></div>
+  <div class="search">⌕　Station oder Standort suchen</div>
+  <div class="card"><div class="section-head"><h2>Interaktive Karte</h2><span class="muted">OpenStreetMap</span></div>
+   <div class="map-tools"><input id="mapSearch" placeholder="Demo-Station suchen"><button onclick="searchMap()">Suchen</button></div>
+   <div class="map-wrap"><div id="stationMap"></div></div>
+   <button class="wide secondary" onclick="locateMe()">Meinen Standort anzeigen</button>
+   <p class="muted">Die markierten Stationen sind Demo-Standorte in München. Für echte Standorte ist eine Datenbank-Anbindung nötig.</p>
+  </div>
+  <div class="station"><div class="station-icon">🔋</div><div><h3>Marienplatz</h3><p>München · U-/S-Bahn</p></div><div class="avail"><b>8 verfügbar</b><small>ca. 250 m</small></div></div>
+  <div class="station"><div class="station-icon">🏬</div><div><h3>Hauptbahnhof</h3><p>München · Haupthalle</p></div><div class="avail"><b>5 verfügbar</b><small>ca. 700 m</small></div></div>
+  <div class="station"><div class="station-icon">☕</div><div><h3>Universität</h3><p>München · Nähe Mensa</p></div><div class="avail"><b>3 verfügbar</b><small>ca. 1,2 km</small></div></div>
+  <div class="card"><b>So funktioniert PowerShare</b><p class="muted">Station auswählen → QR-Code scannen → Powerbank mitnehmen → an einer teilnehmenden Station zurückgeben.</p><button class="wide" onclick="go('rent')">Powerbank ausleihen</button></div>
+  <div class="notice">Die Stationen und Verfügbarkeiten sind Beispieldaten. Es gibt noch keine echte Verbindung zu Ladestationen.</div>
+ </section>
+ <section id="rent" class="panel">
+  <div class="section-head"><h2>Ausleihe</h2><span class="tag" id="status">Noch keine Ausleihe</span></div>
+  <div class="card" style="text-align:center">
+   <div style="font-size:42px">🔋</div><h2>Powerbank ausleihen</h2>
+   <p class="muted">Scanne den QR-Code an einer PowerShare-Station.</p>
+   <div class="qr">▦</div>
+   <button class="wide" onclick="startRental()">Demo-QR-Code scannen</button>
+   <p class="muted">Im Prototyp wird der Scan nur simuliert.</p>
+  </div>
+  <div class="card"><b>Aktuelle Ausleihe</b><p id="rentalText" class="muted">Du hast gerade keine Powerbank ausgeliehen.</p><button id="returnBtn" class="wide secondary" onclick="returnRental()" disabled>Powerbank zurückgeben</button></div>
+ </section>
+<section id="shop-gate" class="panel">
+<div class="card"><h2>Shop für Ladenbesitzer</h2><p class="muted">Gib den Demo-Code ein, um die Stationspakete anzusehen.</p>
+<form id="shopGateForm" onsubmit="event.preventDefault();checkShopGate()">
+<label for="shopGateCode">Demo-Code</label><input id="shopGateCode" type="password" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="Vierstelliger Code" style="display:block;width:100%;padding:14px;border:1px solid #d8e0eb;border-radius:12px;margin:10px 0">
+<button type="submit" class="wide">Shop öffnen</button><p id="shopGateError" role="alert" class="muted"></p></form></div>
+</section>
+<section id="shop" class="panel">
+<div class="section-head"><h2>Shop für Ladenbesitzer</h2><span class="tag">Demo</span></div>
+<div class="card"><b>PowerShare-Partner werden</b><p class="muted">Stationen inklusive Powerbanks für dein Geschäft. Alle Preise sind Demo-Werte.</p></div>
+<div class="shop-grid">
+<article class="shop-product"><div class="art">🔋</div><h3>Starter-Station</h3><p>6 Powerbanks für kleine Läden und Cafés.</p><strong>249 €</strong><button onclick="addShopItem('Starter-Station mit 6 Powerbanks',249)">In den Warenkorb</button></article>
+<article class="shop-product"><div class="art">🏪</div><h3>Business-Station</h3><p>12 Powerbanks für Geschäfte.</p><strong>449 €</strong><button onclick="addShopItem('Business-Station mit 12 Powerbanks',449)">In den Warenkorb</button></article>
+<article class="shop-product"><div class="art">🏬</div><h3>Pro-Station</h3><p>24 Powerbanks für größere Standorte.</p><strong>799 €</strong><button onclick="addShopItem('Pro-Station mit 24 Powerbanks',799)">In den Warenkorb</button></article>
+<article class="shop-product"><div class="art">🔌</div><h3>Zusatzpaket</h3><p>10 weitere Powerbanks.</p><strong>150 €</strong><button onclick="addShopItem('10 zusätzliche Powerbanks',150)">In den Warenkorb</button></article>
+</div>
+<div class="card" style="margin-top:14px"><h2>Warenkorb <span class="tag" id="shopCartCount">0 Artikel</span></h2><div id="shopCart" class="muted" style="margin-top:12px">Noch keine Produkte ausgewählt.</div><div class="cart-total"><b>Gesamt</b><b id="shopCartTotal">0,00 €</b></div><button class="wide" onclick="shopCheckout()">Weiter zur Demo-Kasse</button>
+<div id="demoCheckout" style="display:none;margin-top:16px">
+<h3>Demo-Kasse</h3><p class="muted">Keine echte Zahlung oder Bestellung.</p>
+<form id="demoOrderForm" onsubmit="event.preventDefault();finishDemoOrder()">
+<label for="demoBusiness">Geschäftsname</label><input id="demoBusiness" class="field" required placeholder="Mein Laden">
+<label for="demoEmail">Kontakt-E-Mail</label><input id="demoEmail" class="field" type="email" required placeholder="kontakt@laden.de">
+<label for="demoAddress">Lieferadresse</label><input id="demoAddress" class="field" required placeholder="Straße, PLZ, Ort">
+<button class="wide" type="submit">Demo-Kauf abschließen</button>
+</form></div>
+<p id="demoOrderSuccess" role="status" class="muted"></p></div>
+<div class="notice">Keine echten Bestellungen oder Zahlungen.</div>
+</section>
+ <section id="profile" class="panel">
+  <h2 style="margin:6px 2px 14px">Mein Profil</h2>
+  <div class="card"><div style="font-size:35px">👤</div><h2>Demo-Nutzer</h2><p class="muted">PowerShare Testkonto</p></div>
+  <div class="card"><b>Meine Nutzung</b><div class="statgrid" style="margin-top:13px"><div class="stat"><b id="count">0</b><small>Ausleihen</small></div><div class="stat"><b>0 €</b><small>Demo-Kosten</small></div></div></div>
+  <div class="notice">Profil, Kosten und Verlauf sind nur Beispieldaten. Es werden keine Zahlungen verarbeitet.</div>
+ </section>
+ <section id="admin" class="panel">
+  <h2 style="margin:6px 2px 14px">Stations-Dashboard</h2>
+  <div class="card"><div class="statgrid"><div class="stat"><b>3</b><small>Demo-Stationen</small></div><div class="stat"><b>16</b><small>Verfügbare Powerbanks</small></div><div class="stat"><b id="adminRentals">0</b><small>Aktive Ausleihen</small></div><div class="stat"><b>98 %</b><small>Technische Verfügbarkeit*</small></div></div><p class="muted" style="margin-top:13px">*Nur ein beispielhafter Wert für die Konzeptansicht.</p></div>
+  <div class="card"><b>Stationsübersicht</b><p class="muted">Marienplatz · 8 Geräte</p><p class="muted">Hauptbahnhof · 5 Geräte</p><p class="muted">Universität · 3 Geräte</p></div>
+ </section>
+</main>
+<nav aria-label="Hauptnavigation">
+<a id="nav-discover" href="#discover"><span>⌂</span>Entdecken</a>
+<a id="nav-rent" href="#rent"><span>▣</span>Ausleihe</a>
+<a id="nav-profile" href="#profile"><span>☺</span>Profil</a>
+<a id="nav-admin" href="#admin"><span>▤</span>Admin</a>
+<a id="nav-shop" href="#shop-gate"><span>🛒</span>Shop</a>
+</nav>
+<div class="modal" id="modal"><div class="sheet"><button class="close" onclick="closeModal()">Schließen</button><h2>Ausleihe gestartet!</h2><p class="muted">Deine Demo-Powerbank wurde als ausgeliehen markiert. In einer echten App würde jetzt die Station entsperrt und die Ausleihe gespeichert.</p><button class="wide" onclick="closeModal();go('rent')">Weiter</button></div></div>
+<div class="modal" id="checkoutModal"><div class="sheet"><button class="close" onclick="closeCheckout()">Schließen</button><h2>Demo-Bestellung</h2><p class="muted">Geschäftsdaten für den Demo-Bestellablauf.</p><label class="muted">Ladenname</label><input class="field" id="storeName" placeholder="Musterladen"><label class="muted">E-Mail</label><input class="field" id="storeEmail" type="email" placeholder="kontakt@laden.de"><label class="muted">Lieferadresse</label><input class="field" id="storeAddress" placeholder="Straße, PLZ, Ort"><button class="wide" onclick="placeDemoOrder()">Demo-Bestellung abschließen</button><p id="checkoutMessage" class="muted"></p></div></div>
+<div class="modal" id="shopLoginModal"><div class="sheet"><button class="close" onclick="closeShopLogin()">Schließen</button><h2>Shop für Ladenbesitzer</h2><p class="muted">Gib den Demo-Code ein, um den PowerShare-Shop zu öffnen.</p><input id="shopCode" type="password" autocomplete="off" inputmode="numeric" maxlength="4" placeholder="Demo-Code"><p id="shopLoginError" class="muted"></p><button class="wide" onclick="checkShopCode()">Shop öffnen</button></div></div>
+<footer>PowerShare · Konzept-Prototyp · Keine echte Ausleihe oder Zahlung</footer>
+<script>
+let active=false, rentals=0, cart=[], stationMap=null;
+const stationData=[
+{name:'Marienplatz',lat:48.1372,lng:11.5756,detail:'U-/S-Bahn · 8 Powerbanks verfügbar'},
+{name:'Hauptbahnhof',lat:48.1402,lng:11.5582,detail:'Haupthalle · 5 Powerbanks verfügbar'},
+{name:'Universität',lat:48.1509,lng:11.5802,detail:'Nähe Mensa · 3 Powerbanks verfügbar'},
+{name:'Viktualienmarkt',lat:48.1351,lng:11.5761,detail:'Demo-Standort'},
+{name:'Sendlinger Tor',lat:48.1345,lng:11.5650,detail:'Demo-Standort'}
+];
+function go(id){
+ if(id==='shop'&&!shopUnlocked){location.hash='shop-gate';return}
+ location.hash=id;
+ document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id));
+ updateNav();
+ window.scrollTo(0,0);
+ if(id==='discover')setTimeout(initMap,100);
+}
+function updateNav(){
+ const id=location.hash.slice(1)||'discover';
+ document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('selected',a.getAttribute('href')==='#'+id || (id==='shop'&&a.id==='nav-shop')));
+ if(id==='discover'&&stationMap)setTimeout(()=>stationMap.invalidateSize(),100);
+}
+function checkShopGate(){
+ const code=document.getElementById('shopGateCode').value;
+ if(code==='1234'){
+  shopUnlocked=true;
+  document.getElementById('shop').classList.add('unlocked');
+  document.getElementById('shopGateError').textContent='';
+  document.getElementById('shop-gate').classList.remove('active');
+  document.getElementById('shop').classList.add('active');
+  location.hash='shop';
+  updateNav();
+  document.getElementById('shop').scrollIntoView({block:'start'});
+}
+ else document.getElementById('shopGateError').textContent='Falscher Code. Bitte 1234 eingeben.';
+}
+window.addEventListener('hashchange',()=>{
+ if(location.hash==='#shop'&&!shopUnlocked){location.replace('#shop-gate');return}
+ updateNav();
+});
+function startRental(){if(active){alert('Du hast bereits eine Demo-Powerbank ausgeliehen.');return}active=true;rentals++;document.getElementById('status').textContent='Aktiv';document.getElementById('rentalText').textContent='Demo-Powerbank ausgeliehen · Station Marienplatz';document.getElementById('returnBtn').disabled=false;document.getElementById('count').textContent=rentals;document.getElementById('adminRentals').textContent='1';document.getElementById('modal').classList.add('show')}
+function returnRental(){if(!active)return;active=false;document.getElementById('status').textContent='Zurückgegeben';document.getElementById('rentalText').textContent='Deine Demo-Powerbank wurde zurückgegeben.';document.getElementById('returnBtn').disabled=true;document.getElementById('adminRentals').textContent='0';alert('Danke! Die Demo-Rückgabe war erfolgreich.')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function initMap(){
+ if(stationMap)return;
+ if(!window.L){document.getElementById('stationMap').innerHTML='<p style="padding:20px">Karte benötigt eine Internetverbindung.</p>';return}
+ stationMap=L.map('stationMap').setView([48.142,11.571],13);
+ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(stationMap);
+ stationData.forEach(s=>L.marker([s.lat,s.lng]).addTo(stationMap).bindPopup('<b>'+s.name+'</b><br>'+s.detail));
+ setTimeout(()=>stationMap.invalidateSize(),100);
+}
+function searchMap(){
+ const q=document.getElementById('mapSearch').value.trim().toLowerCase();
+ const s=stationData.find(x=>x.name.toLowerCase().includes(q));
+ if(!q){stationMap.setView([48.142,11.571],13);return}
+ if(!s){alert('Kein passender Demo-Standort gefunden.');return}
+ stationMap.setView([s.lat,s.lng],17);L.popup().setLatLng([s.lat,s.lng]).setContent('<b>'+s.name+'</b><br>'+s.detail).openOn(stationMap);
+}
+function locateMe(){
+ if(!navigator.geolocation){alert('Standortbestimmung nicht verfügbar.');return}
+ navigator.geolocation.getCurrentPosition(pos=>{const p=[pos.coords.latitude,pos.coords.longitude];stationMap.setView(p,16);L.marker(p).addTo(stationMap).bindPopup('Dein Standort').openPopup()},()=>alert('Standortzugriff nicht möglich. Bitte Berechtigung prüfen.'),{enableHighAccuracy:true,timeout:10000});
+}
+function addToCart(name,price){cart.push({name,price});renderCart()}
+function removeCartItem(i){cart.splice(i,1);renderCart()}
+function renderCart(){
+ document.getElementById('cartCount').textContent=cart.length+' Artikel';
+ document.getElementById('cartItems').innerHTML=cart.length?cart.map((x,i)=>'<div class="cart-line"><span>'+x.name+'</span><span>'+x.price+',00 € <button class="secondary" style="padding:4px 8px" onclick="removeCartItem('+i+')">×</button></span></div>').join(''):'Dein Warenkorb ist leer.';
+ const total=cart.reduce((a,x)=>a+x.price,0);document.getElementById('cartTotal').textContent=total.toFixed(2).replace('.',',')+' €';
+}
+function showCheckout(){if(!cart.length){alert('Dein Warenkorb ist leer.');return}document.getElementById('checkoutModal').classList.add('show')}
+function closeCheckout(){document.getElementById('checkoutModal').classList.remove('show')}
+function placeDemoOrder(){
+ const n=document.getElementById('storeName').value.trim(),e=document.getElementById('storeEmail').value.trim(),a=document.getElementById('storeAddress').value.trim();
+ if(!n||!e||!a){alert('Bitte fülle alle Felder aus.');return}
+ document.getElementById('checkoutMessage').textContent='Danke, '+n+'! Deine Demo-Bestellung über '+document.getElementById('cartTotal').textContent+' wurde simuliert. Es wurde nichts bestellt oder bezahlt.';
+ cart=[];renderCart();
+}
+
+let shopUnlocked=false, shopCart=[];
+function openShop(){
+ if(shopUnlocked){go('shop');return}
+ document.getElementById('shopCode').value='';
+ document.getElementById('shopLoginError').textContent='';
+ document.getElementById('shopLoginModal').classList.add('show');
+}
+function closeShopLogin(){document.getElementById('shopLoginModal').classList.remove('show')}
+function checkShopCode(){
+ if(document.getElementById('shopCode').value==='1234'){shopUnlocked=true;closeShopLogin();go('shop')}
+ else document.getElementById('shopLoginError').textContent='Der Code ist nicht korrekt. Bitte versuche es erneut.';
+}
+function addShopItem(name,price){shopCart.push({name,price});renderShopCart()}
+function removeShopItem(index){shopCart.splice(index,1);renderShopCart()}
+function renderShopCart(){
+ document.getElementById('shopCartCount').textContent=shopCart.length+' Artikel';
+ document.getElementById('shopCart').innerHTML=shopCart.length?shopCart.map((item,i)=>'<div class="cart-line"><span>'+item.name+'</span><span>'+item.price+',00 € <button class="secondary" style="padding:4px 8px" onclick="removeShopItem('+i+')">×</button></span></div>').join(''):'Noch keine Produkte ausgewählt.';
+ const total=shopCart.reduce((sum,item)=>sum+item.price,0);
+ document.getElementById('shopCartTotal').textContent=total.toFixed(2).replace('.',',')+' €';
+}
+function shopCheckout(){
+ if(!shopCart.length){alert('Bitte lege zuerst eine Station in den Warenkorb.');return}
+ document.getElementById('demoCheckout').style.display='block';
+ document.getElementById('demoCheckout').scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function finishDemoOrder(){
+ const name=document.getElementById('demoBusiness').value.trim();
+ const email=document.getElementById('demoEmail').value.trim();
+ const address=document.getElementById('demoAddress').value.trim();
+ if(!name||!email||!address||!shopCart.length)return;
+ document.getElementById('demoOrderSuccess').textContent='Demo-Kauf erfolgreich simuliert! Vielen Dank, '+name+'. Es wurde keine echte Bestellung ausgelöst.';
+ document.getElementById('demoCheckout').style.display='none';
+ shopCart=[];renderShopCart();
+}
+
+window.addEventListener('load',()=>{if(location.hash==='#shop'&&!shopUnlocked)location.replace('#shop-gate');updateNav();setTimeout(initMap,300)});
+</script>
+</body></html>
